@@ -22,6 +22,7 @@ def run_benchmark(
     instance: dict[str, Any],
     penalty_weights: dict[str, float] | None = None,
     qaoa_p_layers: int = 2,
+    qaoa_max_iter: int = 100,
     qaoa_shots: int = 1024,
     qaoa_seed: int = 42,
     results_path: str | Path = "results/benchmark_table.csv",
@@ -36,6 +37,8 @@ def run_benchmark(
         Penalty weights for QUBO builder.  Defaults to heuristic values.
     qaoa_p_layers : int
         QAOA layer count.
+    qaoa_max_iter : int
+        QAOA max classical optimization iterations.
     qaoa_shots : int
         Measurement shots per QAOA evaluation.
     qaoa_seed : int
@@ -92,6 +95,7 @@ def run_benchmark(
         qaoa_result = solve_cvrp_qaoa(
             qubo,
             p_layers=qaoa_p_layers,
+            max_iter=qaoa_max_iter,
             shots=qaoa_shots,
             seed=qaoa_seed,
         )

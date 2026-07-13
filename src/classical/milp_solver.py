@@ -1,5 +1,8 @@
 """Exact MILP solver for CVRP (stretch-goal cross-check)."""
 
+# NOTE: This solver is intentionally unimplemented as it is a stretch goal.
+
+
 from __future__ import annotations
 
 from typing import Any

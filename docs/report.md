@@ -70,10 +70,10 @@ For full derivations, see [docs/math_derivation.md](math_derivation.md).
 ### 5.1 Problem Encoding
 We use a **position-based encoding** for the QUBO:
 - Binary variable x[i,p] = 1 if customer i is at position p in the linearized route sequence
-- 4 customers × 4 positions = 16 decision variables
-- After constraint conversion: ~24 total qubits (including slack variables from inequality constraints)
+- 3 customers × 3 positions = 9 decision variables
+- After constraint conversion: 17 total qubits (including slack variables from capacity constraints)
 
-**Note on instance size:** We use 4 customers rather than 5 because the position encoding for 5 customers produces 33 qubits after constraint conversion, which requires ~128 GB RAM for statevector simulation. 4 customers (24 qubits, ~256 MB) is well within practical limits.
+**Note on instance size:** We use 3 customers by default (17 qubits, ~50s execution) to ensure fast simulation. Running 4 customers requires 24 qubits (which takes over an hour to simulate on standard CPU without hardware acceleration), and 5 customers requires 33 qubits (which requires ~128 GB RAM for statevector simulation and is intractable).
 
 ### 5.2 Constraint Penalties
 Three constraint types are converted to penalty terms:
@@ -81,11 +81,11 @@ Three constraint types are converted to penalty terms:
 2. **Position:** each position occupied by exactly one customer (Σ_i x[i,p] = 1 for all p)
 3. **Capacity:** vehicle load does not exceed Q (using position-based route splitting)
 
-Penalty weight λ is set heuristically to max_distance × n_customers ≈ 360.
+Penalty weight λ is set heuristically to max_distance × n_customers ≈ 198.
 
 ### 5.3 Solvers
 - **Classical:** OR-Tools with Guided Local Search metaheuristic, 5-second time limit
-- **Quantum:** QAOA with p=1 layer, COBYLA optimizer (200 max iterations), StatevectorSampler
+- **Quantum:** QAOA with p=2 layers, COBYLA optimizer (100 max iterations), StatevectorSampler
 
 ---
 
@@ -113,17 +113,17 @@ The project is structured as modular Python packages:
 
 | Parameter | Value |
 |-----------|-------|
-| Customers | 4 |
+| Customers | 3 |
 | Vehicles | 2 |
 | Vehicle capacity (Q) | 15 |
-| Customer demands | [2, 1, 6, 4] |
-| Total demand | 13 |
+| Customer demands | [2, 1, 6] |
+| Total demand | 9 |
 | Random seed | 42 |
 | OR-Tools strategy | Guided Local Search, 5s limit |
 | QAOA layers (p) | 2 |
-| QAOA optimizer | COBYLA (maxiter=200) |
+| QAOA optimizer | COBYLA (maxiter=100) |
 | QAOA sampler | StatevectorSampler (exact simulation) |
-| Total qubits | 24 |
+| Total qubits | 17 |
 | Platform | Python 3.13, Qiskit 2.5.0, macOS |
 
 ---
@@ -134,12 +134,12 @@ The project is structured as modular Python packages:
 
 Results from `python run_all.py`:
 
-| Metric | OR-Tools (GLS) | QAOA (p=1) |
+| Metric | OR-Tools (GLS) | QAOA (p=2) |
 |--------|---------------|------------|
-| Total Distance | ~229.0 | varies (see results/benchmark_table.csv) |
-| Runtime (s) | ~5.0 | varies |
+| Total Distance | 137.7065 | varies (see results/benchmark_table.csv) |
+| Runtime (s) | ~5.0 | varies (~50s) |
 | Feasible | ✓ Yes | see benchmark_table.csv |
-| Qubits | N/A | 33 |
+| Qubits | N/A | 17 |
 | Approximation Ratio | 1.00 (baseline) | see benchmark_table.csv |
 
 > **Note:** QAOA results vary — the algorithm is probabilistic, and feasibility depends on whether the optimizer converges to a constraint-satisfying bitstring. See `results/benchmark_table.csv` for the actual numbers from our run.
@@ -172,9 +172,9 @@ OR-Tools finds near-optimal solutions for this small instance essentially instan
 ### 9.2 Runtime
 The runtime comparison strongly favors classical methods:
 - OR-Tools: seconds (dominated by metaheuristic exploration time limit)
-- QAOA on simulator: minutes (exponential simulation cost in qubit count)
+- QAOA on simulator: less than a minute for 17 qubits, but grows exponentially.
 
-This is expected: statevector simulation of 33 qubits requires manipulating 2³³ ≈ 8.6 billion complex amplitudes. On real quantum hardware, the circuit execution time would be much shorter, but current QPU fidelity introduces noise-related errors.
+This is expected: statevector simulation scales exponentially. While 17 qubits can be simulated in under a minute, 24 qubits (4 customers) takes over an hour, and 33 qubits (5 customers) requires manipulating 2³³ ≈ 8.6 billion complex amplitudes, making it completely intractable on a standard CPU without acceleration. On real quantum hardware, the circuit execution time would be much shorter, but current QPU fidelity introduces noise-related errors.
 
 ### 9.3 Penalty Weight Sensitivity
 Our heuristic penalty weights (λ ≈ 450, derived as max_distance × n_customers) represent a reasonable middle ground. Lower values lead to constraint-violating solutions; higher values make the optimization landscape too steep for the QAOA optimizer to navigate effectively.
@@ -191,7 +191,7 @@ QAOA does not outperform classical heuristics at this scale. This result is:
 
 1. **Simulator only:** All quantum execution uses ideal statevector simulation. No noise modeling or real quantum hardware was used.
 
-2. **Small instance size:** 5 customers with position encoding requires 33 qubits, near the practical limit for statevector simulation (~25 qubits is comfortable; 33 is very memory-intensive). Larger instances are infeasible without algorithmic improvements.
+2. **Small instance size:** The default run is configured to 3 customers (17 qubits) for fast out-of-the-box execution. 4 customers requires 24 qubits, which takes over an hour to simulate, and 5 customers requires 33 qubits, which is near the practical limit for statevector simulation. Larger instances are infeasible without algorithmic improvements.
 
 3. **No noise modeling:** Real quantum hardware introduces gate errors, decoherence, and readout noise that would further degrade QAOA performance.
 

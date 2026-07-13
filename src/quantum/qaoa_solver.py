@@ -63,6 +63,7 @@ def solve_cvrp_qaoa(
     qubo: QuadraticProgram,
     p_layers: int = 2,
     optimizer: str = "COBYLA",
+    max_iter: int = 100,
     shots: int = 1024,
     seed: int = 42,
 ) -> dict[str, Any]:
@@ -77,6 +78,8 @@ def solve_cvrp_qaoa(
         but deeper circuit.
     optimizer : str
         Classical optimizer name: ``"COBYLA"`` or ``"SPSA"``.
+    max_iter : int
+        Maximum number of classical optimization iterations.
     shots : int
         Number of measurement shots per circuit evaluation.
     seed : int
@@ -97,12 +100,14 @@ def solve_cvrp_qaoa(
     def callback(eval_count: int, params: np.ndarray, value: float,
                  metadata: dict) -> None:
         convergence_history.append(value)
+        print(f"    Iteration {eval_count:3d}: Energy/Value = {value:10.4f}", flush=True)
 
     # Select classical optimizer
     if optimizer.upper() == "COBYLA":
-        opt = COBYLA(maxiter=200)
+        opt = COBYLA(maxiter=max_iter)
     elif optimizer.upper() == "SPSA":
-        opt = SPSA(maxiter=200)
+        opt = SPSA(maxiter=max_iter)
+
     else:
         raise ValueError(f"Unsupported optimizer: {optimizer}")
 

@@ -38,11 +38,12 @@ from src.visualize.plots import plot_routes, plot_convergence, plot_benchmark_co
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the full CVRP benchmark.")
     parser.add_argument("--seed", type=int, default=42, help="Random seed (default: 42)")
-    parser.add_argument("--customers", type=int, default=4, help="Number of customers (default: 4)")
+    parser.add_argument("--customers", type=int, default=3, help="Number of customers (default: 3)")
     parser.add_argument("--vehicles", type=int, default=2, help="Number of vehicles (default: 2)")
     parser.add_argument("--capacity", type=int, default=15, help="Vehicle capacity (default: 15)")
     parser.add_argument("--qaoa-layers", type=int, default=2, help="QAOA p-layers (default: 2)")
     parser.add_argument("--qaoa-shots", type=int, default=1024, help="QAOA shots (default: 1024)")
+    parser.add_argument("--max-iter", type=int, default=100, help="QAOA max classical iterations (default: 100)")
     args = parser.parse_args()
 
     project_root = Path(__file__).parent
@@ -121,12 +122,13 @@ def main() -> None:
     # STEP 4: QAOA solver
     # ------------------------------------------------------------------
     print(f"\n[Step 4] Running QAOA solver (p={args.qaoa_layers}, "
-          f"shots={args.qaoa_shots})...")
+          f"max_iter={args.max_iter}, shots={args.qaoa_shots})...")
     print(f"  → This may take several minutes for {num_vars} qubits...")
 
     qaoa_result = solve_cvrp_qaoa(
         qubo,
         p_layers=args.qaoa_layers,
+        max_iter=args.max_iter,
         shots=args.qaoa_shots,
         seed=args.seed,
     )

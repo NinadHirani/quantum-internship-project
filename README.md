@@ -15,13 +15,15 @@ The goal is to provide a clear, reproducible comparison that demonstrates the fu
 
 | Parameter | Value |
 |-----------|-------|
-| Customers | 4 (nodes 1–4) |
+| Customers | 3 (nodes 1–3) |
 | Depot | Node 0 |
 | Vehicles | 2 |
 | Vehicle Capacity (Q) | 15 |
 | Random Seed | 42 |
 
 The instance is generated deterministically from `seed=42` and saved to `data/instance_seed42.json`.
+
+> **Note:** The default out-of-the-box configuration uses 3 customers (17 qubits) to ensure fast simulation. Running with 4 customers (24 qubits) is available as an opt-in but takes significantly longer (>1 hour) due to exponential simulation scaling.
 
 ## Project Structure
 
@@ -83,10 +85,15 @@ This generates the instance, runs both solvers, saves the benchmark CSV, and pro
 
 **Options:**
 ```bash
-python run_all.py --customers 4       # number of customers (default: 4)
+python run_all.py --customers 3       # number of customers (default: 3)
 python run_all.py --qaoa-layers 2     # QAOA circuit depth (default: 2)
+python run_all.py --max-iter 100      # QAOA max classical iterations (default: 100)
 python run_all.py --seed 42           # random seed (default: 42)
 ```
+
+**Expected Runtime:**
+- The default 3-customer run (17 qubits) takes ~50 seconds to complete on a standard laptop CPU.
+- A 4-customer run (24 qubits) takes over an hour to simulate in pure Python without acceleration.
 
 ### Run individual solvers
 
