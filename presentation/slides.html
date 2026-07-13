@@ -309,10 +309,10 @@
         <div class="card">
             <h3>Our Instance</h3>
             <ul>
-                <li><strong>1 depot</strong> + <strong>5 customers</strong></li>
+                <li><strong>1 depot</strong> + <strong>3 customers</strong></li>
                 <li><strong>2 vehicles</strong>, capacity Q = 15</li>
-                <li>Demands: [2, 1, 6, 4, 4]</li>
-                <li>Total demand = 17 (must split across vehicles)</li>
+                <li>Demands: [2, 1, 6]</li>
+                <li>Total demand = 9 (must split across vehicles)</li>
                 <li>Seed = 42 (fully reproducible)</li>
             </ul>
         </div>
@@ -372,9 +372,9 @@
         <div class="card">
             <h3>Scale</h3>
             <ul>
-                <li>5 customers × 5 positions = <strong>25</strong> binary vars</li>
-                <li>+ 8 auxiliary (slack) vars = <strong>33 qubits total</strong></li>
-                <li>Penalty weights: λ ≈ 450 (heuristic)</li>
+                <li>3 customers × 3 positions = <strong>9</strong> binary vars</li>
+                <li>+ 8 auxiliary (slack) vars = <strong>17 qubits total</strong></li>
+                <li>Penalty weights: λ ≈ 198 (heuristic)</li>
             </ul>
         </div>
     </div>
@@ -478,14 +478,14 @@
 <!-- ===================== SLIDE 7: Results ===================== -->
 <div class="slide" id="slide-7">
     <h2>Benchmark Results</h2>
-    <p>5 customers, 2 vehicles, capacity 15, seed 42</p>
+    <p>3 customers, 2 vehicles, capacity 15, seed 42</p>
 
     <table style="margin: 20px 0;">
-        <tr><th>Metric</th><th><span class="badge badge-classical">OR-Tools (GLS)</span></th><th><span class="badge badge-quantum">QAOA (p=1)</span></th></tr>
+        <tr><th>Metric</th><th><span class="badge badge-classical">OR-Tools (GLS)</span></th><th><span class="badge badge-quantum">QAOA (p=2)</span></th></tr>
         <tr><td>Total Distance</td><td class="success" id="res-ort-dist">—</td><td id="res-qaoa-dist">—</td></tr>
         <tr><td>Runtime</td><td id="res-ort-time">—</td><td id="res-qaoa-time">—</td></tr>
         <tr><td>Feasible Solution</td><td class="success">✓ Yes</td><td id="res-qaoa-feas">—</td></tr>
-        <tr><td>Qubits Required</td><td>N/A</td><td id="res-qaoa-qubits">33</td></tr>
+        <tr><td>Qubits Required</td><td>N/A</td><td id="res-qaoa-qubits">17</td></tr>
         <tr><td>Approx. Ratio</td><td>1.00 (baseline)</td><td id="res-qaoa-ratio">—</td></tr>
     </table>
 
@@ -516,7 +516,7 @@
         <div class="card">
             <h3>⚡ Quantum Challenges</h3>
             <ul>
-                <li><span class="warning">Qubit overhead:</span> 5 customers → 33 qubits</li>
+                <li><span class="warning">Qubit overhead:</span> 3 customers → 17 qubits</li>
                 <li><span class="warning">Penalty sensitivity:</span> λ too low → infeasible; too high → poor optimization</li>
                 <li><span class="warning">Simulation cost:</span> exponential in qubit count</li>
             </ul>
@@ -537,7 +537,7 @@
             <h3>Current Limitations</h3>
             <ul>
                 <li><span class="danger">Simulator only</span> — no real quantum hardware</li>
-                <li>Small instance (5 customers) due to qubit ceiling</li>
+                <li>Small instance (3 customers) due to qubit ceiling</li>
                 <li>No noise modeling (ideal simulation)</li>
                 <li>QAOA limited to p = 1–2 layers (deeper = too slow)</li>
                 <li>Position encoding is qubit-hungry: O(n²)</li>

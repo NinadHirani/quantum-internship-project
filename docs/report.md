@@ -155,7 +155,7 @@ Results from `python run_all.py`:
 
 1. **OR-Tools** consistently finds feasible, high-quality solutions in under a second of compute time (the 5s figure includes solver startup and guided local search iterations).
 
-2. **QAOA** with p=1 produces solutions that may or may not satisfy all constraints, depending on the optimization landscape. When feasible, the total distance is typically higher than the classical solution.
+2. **QAOA** with p=2 produces solutions that may or may not satisfy all constraints, depending on the optimization landscape. When feasible, the total distance is typically higher than the classical solution.
 
 3. The **convergence plot** shows the COBYLA optimizer exploring the (γ, β) parameter space, typically converging within 100-200 iterations.
 
@@ -166,8 +166,8 @@ Results from `python run_all.py`:
 ### 9.1 Solution Quality
 OR-Tools finds near-optimal solutions for this small instance essentially instantly. QAOA's solution quality is limited by:
 - The penalty-based constraint encoding (soft constraints rather than hard enforcement)
-- The shallow circuit depth (p=1 limits the algorithm's approximation power)
-- The large QUBO variable count (33 qubits creates a vast search space)
+- The shallow circuit depth (p=2 still limits the algorithm's approximation power compared to deeper layer counts)
+- The large QUBO variable count (17 qubits creates a vast search space)
 
 ### 9.2 Runtime
 The runtime comparison strongly favors classical methods:
@@ -195,7 +195,7 @@ QAOA does not outperform classical heuristics at this scale. This result is:
 
 3. **No noise modeling:** Real quantum hardware introduces gate errors, decoherence, and readout noise that would further degrade QAOA performance.
 
-4. **Shallow circuit:** We use p=1 QAOA layer. More layers (p ≥ 3) would improve approximation quality but increase circuit depth and simulation cost.
+4. **Shallow circuit:** We use p=2 QAOA layers. More layers (p ≥ 3) would improve approximation quality but increase circuit depth and simulation cost.
 
 5. **Single instance:** Results are based on one CVRP instance (seed=42). A more comprehensive study would benchmark across multiple instances with varying characteristics.
 
